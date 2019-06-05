@@ -41,9 +41,9 @@ export class IndexDBService implements IIndexService {
             let child: Artifact = {} as Artifact;
             // parent.parent = "";
 
-            while (queue) {
+            while (queue.length > 0) {
                 file = queue.shift();
-
+                child = new Artifact();
                 child.label = file.name;
                 child.filePath = file.path;
                 child.type = this.getFileType(file);
@@ -53,12 +53,12 @@ export class IndexDBService implements IIndexService {
                 await this.addIndexToDB(child);
                 stack = file.children;
                 parent = child;
-                child = {} as Artifact;
-                while (stack) {
+                while (stack.length > 0) {
                     file = stack.pop();
                     if (file.isDir) {
                         queue.push(file);
                     } else {
+                        child = new Artifact();
                         child.label = file.name;
                         child.filePath = file.path;
                         child.type = this.getFileType(file);
@@ -67,6 +67,7 @@ export class IndexDBService implements IIndexService {
                     }
                 }
 
+                console.log(queue);
             }
 
         }
@@ -86,9 +87,9 @@ export class IndexDBService implements IIndexService {
             return 99;
         }
         switch (file.type.toLocaleLowerCase()) {
-            case "ui":
+            case ".ui":
                 return 1;
-            case "json":
+            case ".json":
                 return 0;
             default:
                 return 99;
