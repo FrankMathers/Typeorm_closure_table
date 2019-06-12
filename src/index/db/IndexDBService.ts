@@ -44,7 +44,7 @@ export class IndexDBService implements IIndexService {
                 child = new Model();
                 child.name = file.name;
                 child.filePath = path.relative(process.cwd(), file.path);
-                child.type = this.getFileType(file);
+                child.type = await this.getFileType(file);
                 if (parent.name) {
                     child.parent = parent;
                 }
@@ -59,9 +59,12 @@ export class IndexDBService implements IIndexService {
                         child = new Model();
                         child.name = file.name;
                         child.filePath = path.relative(process.cwd(), file.path);
-                        child.type = this.getFileType(file);
+                        child.type = await this.getFileType(file);
                         child.parent = parent;
                         await this.addIndexToDB(child);
+                        if (child.type === 1) {
+                            this.addBoIndex(child);
+                        }
                     }
                 }
             }
@@ -80,7 +83,11 @@ export class IndexDBService implements IIndexService {
         return manger.save(model);
     }
 
-    private getFileType(file: File) {
+    public async addBoIndex(model: Model) {
+        const bo = JSON.parse(await this.fileService.readFileContent(model.filePath));
+        const nodes = bo.Nodes;
+    }
+    private async getFileType(file: File) {
         if (file.isDir) {
             return 3;
         }
@@ -91,9 +98,20 @@ export class IndexDBService implements IIndexService {
             case ".ui":
                 return 2;
             case ".json":
-                return 1;
+                const isBo = await this.isBo(file);
+                if (isBo) {
+                    return 1;
+                }
+                return 99;
             default:
                 return 99;
         }
+    }
+    private async isBo(file: File) {
+        const bo = JSON.parse(await this.fileService.readFileContent(file.path));
+        if (bo.NameKey && bo.Nodes) {
+            return true
+        }
+        return false;
     }
 }
