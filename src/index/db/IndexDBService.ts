@@ -3,51 +3,49 @@ import { injectable, inject } from "inversify";
 import { TYPES } from "../../bootstrap/types";
 import { IFileService } from "../../filesystem/IFileService";
 import { File } from "../../filesystem/File";
-import * as sqlite from 'sqlite3';
-import { ConnectionOptions, createConnection, getManager } from "typeorm";
-import { Artifact } from './entity/artifact';
-
+import * as sqlite from "sqlite3";
+import { createConnection, getManager } from "typeorm";
+import * as path from "path";
+import { Model } from "./entities/Model";
+import logger from "../../log/LogService";
 
 @injectable()
 export class IndexDBService implements IIndexService {
-
     @inject(TYPES.FileService) public fileService: IFileService;
 
     public async initIndexRepository(): Promise<void> {
         // Init DB files and etc
-        // delete db files
-        // const db = new sqlite.Database('dts.sqlite3');
-        const options: ConnectionOptions = {
-            type: "sqlite",
-            database: `./dts.sqlite3`,
-            entities: [Artifact],
-            synchronize: true,
-            logging: ["query", "error", "schema", "log", "warn", "info"]
+
+        /* Force sqlite module is loaded, otherwise sqlite module will be loaded from user 
+		  module dependency dyamically */
+        sqlite.verbose();
+        try {
+            await this.fileService.deleteFile(`./temp/dts.sqlite3`);
+        } catch (e) {
+            logger.emitInfo("IndexDBService:initIndexRepository", "no dts.sqlite3 exists");
         }
-        const connection = await createConnection(options);
+        await createConnection();
         return;
     }
 
     public async buildIndexFromFile(rootPath: string): Promise<void> {
         try {
-            const manger = getManager();
-            const artifact: Artifact = {} as Artifact;
             const queue: File[] = [];
             let stack: File[] = [];
             let file = await this.fileService.readDirectory(rootPath);
 
             queue.push(file);
-            let parent: Artifact = {} as Artifact;
-            let child: Artifact = {} as Artifact;
+            let parent: Model = {} as Model;
+            let child: Model = {} as Model;
             // parent.parent = "";
 
             while (queue.length > 0) {
                 file = queue.shift();
-                child = new Artifact();
-                child.label = file.name;
-                child.filePath = file.path;
+                child = new Model();
+                child.name = file.name;
+                child.filePath = path.relative(process.cwd(), file.path);
                 child.type = this.getFileType(file);
-                if (parent.label) {
+                if (parent.name) {
                     child.parent = parent;
                 }
                 await this.addIndexToDB(child);
@@ -58,39 +56,42 @@ export class IndexDBService implements IIndexService {
                     if (file.isDir) {
                         queue.push(file);
                     } else {
-                        child = new Artifact();
-                        child.label = file.name;
-                        child.filePath = file.path;
+                        child = new Model();
+                        child.name = file.name;
+                        child.filePath = path.relative(process.cwd(), file.path);
                         child.type = this.getFileType(file);
                         child.parent = parent;
                         await this.addIndexToDB(child);
                     }
                 }
-
-                console.log(queue);
             }
-
-        }
-        catch (err) {
-            console.log(err);
+        } catch (err) {
+            logger.emitInfo("IndexDBService:initIndexRepository", err);
         }
         return;
     }
 
-    public async addIndexToDB(artifact: Artifact): Promise<Artifact> {
+    public async updateIndex() {
+        return;
+    }
+
+    public async addIndexToDB(model: Model): Promise<Model> {
         const manger = getManager();
-        return manger.save(artifact);
+        return manger.save(model);
     }
 
     private getFileType(file: File) {
+        if (file.isDir) {
+            return 3;
+        }
         if (!file.type) {
             return 99;
         }
         switch (file.type.toLocaleLowerCase()) {
             case ".ui":
-                return 1;
+                return 2;
             case ".json":
-                return 0;
+                return 1;
             default:
                 return 99;
         }

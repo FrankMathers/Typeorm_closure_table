@@ -1,5 +1,6 @@
 import { Severity } from "../log/LogService"
 export class Options {
-  public logLevel: Severity;
-  public port: string;
+  public rootPath: string = process.cwd();
+  public logLevel: Severity = Severity.Debug;
+  public port: string = "5100";
 }

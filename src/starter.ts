@@ -1,13 +1,22 @@
-import "reflect-metadata"
-import DIContainer from "./bootstrap/Container";
-import { DesignTimeService } from './bootstrap/DesignTimeService'
-import { Options } from "./bootstrap/Options";
-import { Severity } from "./log/LogService"
+#!/usr/bin/env node
 
-const dts: DesignTimeService = DIContainer.resolve<DesignTimeService>(DesignTimeService);
+import { dtsInstance } from './bootstrap/exports'
+import { Options } from "./bootstrap/Options";
 
 // Create options
 const options: Options = new Options();
-options.logLevel = Severity.Info;
 
-dts.start(process.cwd(), options);
+// Parse parameters from command line
+process.argv.forEach((val, index) => {
+  // Start with specified file repository root path
+  if (val === "-r" || val === "-R") {
+    options.rootPath = process.argv[index + 1];
+  }
+
+  // Start with specified port number
+  if (val === "-p" || val === "-P") {
+    options.port = process.argv[index + 1];
+  }
+});
+
+dtsInstance.start(options);

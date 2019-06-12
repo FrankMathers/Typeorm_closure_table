@@ -23,7 +23,8 @@
 			"type": "node",
 			"request": "launch",
 			"name": "Launch Program",
-			"program": "${workspaceFolder}\\dist\\starter.js"
+			"program": "${workspaceFolder}\\dist\\starter.js",
+			"preLaunchTask": "npm: build"
 		}
 	]
 }

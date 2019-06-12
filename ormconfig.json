@@ -1,6 +1,13 @@
 {
 	"type": "sqlite",
-	"database": "dist/index.sqlite",
-	"entities": ["dist/index/db/models/*.js"],
-	"logging": true
+	"database": "./temp/dts.sqlite3",
+	"entities": [
+		"dist/index/db/entities/*.js"
+	],
+	"synchronize": true,
+	"logging": [
+		"error",
+		"schema",
+		"warn"
+	]
 }

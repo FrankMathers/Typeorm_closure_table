@@ -4,13 +4,16 @@ import fs from "fs"
 import path from "path"
 import { File } from './File';
 import { IgnoreRule } from './IgnoreRule';
-import logger from "../log/LogUtility"
+import logger from "../log/LogService"
+import { FileEmitter, FileEvent } from './FileEmitter';
 
 @injectable()
 export class FileService implements IFileService {
 
-    public async watchFileRepository(rootPath: string): Promise<void> {
-        return;
+    public async watchFileRepository(rootPath: string, fileEmitter: FileEmitter): Promise<void> {
+        fs.watch(rootPath, { persistent: true, recursive: true }, (eventType, filename) => {
+            fileEmitter.emit(FileEvent.Change, filename);
+        });
     }
 
     public async readFileContent(filePath: string): Promise<string> {
@@ -44,7 +47,7 @@ export class FileService implements IFileService {
         for (const singleFile of result) {
 
             // Build file entry from file
-            logger.emitInfo("FileService:readDirectory", "start to read file " + singleFile);
+            logger.emitDebug("FileService:readDirectory", "start to read file " + singleFile);
 
             // Check if current file should be ignored
             if (this.matchIgnoreRule(singleFile, ignoreRule) === true) {
@@ -72,9 +75,15 @@ export class FileService implements IFileService {
             }
         }
 
-        logger.emitInfo("FileService:readDirectory", "end of reading file and count: " + File.count);
+        logger.emitDebug("FileService:readDirectory", "end of reading file and count: " + File.count);
 
         return parent;
+    }
+
+    public async deleteFile(filePath: string) {
+        const fsPromise = fs.promises;
+        await fsPromise.unlink(filePath);
+        return;
     }
 
     private async buildIgnoreRule(parent: File, result: string[]): Promise<IgnoreRule> {

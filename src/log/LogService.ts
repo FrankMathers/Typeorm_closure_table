@@ -65,10 +65,10 @@ export class LogServiceImpl implements ILogService {
   }
 
   public emitError(location: string, info: string, data?: any) {
-    return;
+    this.logger.log({ level: Severity.Error, message: location + '-' + info });
   }
   public emitDebug(location: string, info: string, data?: any) {
-    return;
+    this.logger.log({ level: Severity.Debug, message: location + '-' + info });
   }
   public emitInfo(location: string, info: string, data?: any) {
     this.logger.log({ level: Severity.Info, message: location + '-' + info });
@@ -78,4 +78,8 @@ export class LogServiceImpl implements ILogService {
     this.logger.transports[0].level = logLevel;
   }
 }
+
+const logger: ILogService = new LogServiceImpl();
+
+export default logger
 

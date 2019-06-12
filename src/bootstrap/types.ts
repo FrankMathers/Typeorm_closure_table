@@ -1,7 +1,7 @@
 const TYPES = {
     FileService: Symbol.for("FileService"),
     IndexService: Symbol.for("IndexService"),
-    LogService: Symbol.for("LogService")
+    APIService: Symbol.for("APIService")
 };
 
 export { TYPES };
