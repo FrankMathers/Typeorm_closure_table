@@ -10,11 +10,11 @@ import {
     Timestamp,
     UpdateDateColumn
 } from "typeorm";
-import { ModelType } from "../../../model/base/IModel";
+import { ModelType, IModel } from "../../../model/base/IModel";
 
 @Entity()
 @Tree("closure-table")
-export class Model {
+export class Model implements IModel {
     @PrimaryGeneratedColumn("uuid")
     public id: string;
 

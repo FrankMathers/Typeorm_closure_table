@@ -1,10 +1,12 @@
-import EventEmitter from "events"
+import EventEmitter from "events";
 
 export enum FileEvent {
-  Change = "change",
-  Rename = "rename"
+    Add = "add",
+    Change = "change",
+    AddDir = "addDir",
+    Unlink = "unlink",
+    UnlinkDir = "unlinkDir",
+    Rename = "rename"
 }
 
-export class FileEmitter extends EventEmitter {
-
-}
+export class FileEmitter extends EventEmitter {}

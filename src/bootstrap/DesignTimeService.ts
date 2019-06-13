@@ -1,18 +1,22 @@
 import { inject } from "inversify";
 import { TYPES } from "./types";
-import { injectable } from 'inversify';
+import { injectable } from "inversify";
 import { IFileService } from "../filesystem/IFileService";
 import { IIndexService } from "../index/IndexService";
-import { Options } from "./Options"
+import { Options } from "./Options";
 import { Severity } from "../log/LogService";
 import logger from "../log/LogService";
 import { IAPIService } from "../api/IAPIService";
-import express from 'express'
+import express from "express";
 import { FileEmitter, FileEvent } from "../filesystem/FileEmitter";
+import { FILE } from "dns";
 
+interface iFile {
+    filePath: string;
+    action: FileEvent;
+}
 @injectable()
 export class DesignTimeService {
-
     @inject(TYPES.FileService) private fileService: IFileService;
 
     @inject(TYPES.IndexService) private indexService: IIndexService;
@@ -21,8 +25,10 @@ export class DesignTimeService {
 
     private fileEmitter: FileEmitter;
 
-    public async start(options: Options): Promise<void> {
+    private delayTime: number = 1000;
 
+    private fileQueue: iFile[] = [];
+    public async start(options: Options): Promise<void> {
         // Set log level
         logger.setLogLevel(options.logLevel ? options.logLevel : Severity.Error);
 
@@ -31,6 +37,8 @@ export class DesignTimeService {
         // Init Index Repository
         await this.indexService.initIndexRepository();
 
+        this.initFileWatcher(options);
+
         // Build index from File Repository
         await this.indexService.buildIndexFromFile(options.rootPath);
 
@@ -38,7 +46,6 @@ export class DesignTimeService {
         await this.apiService.start(options);
 
         // Init File Watch functionality
-        this.initFileWatcher(options);
 
         logger.emitInfo("DesignTimeService:start", "End initialization");
     }
@@ -48,28 +55,30 @@ export class DesignTimeService {
     }
 
     private initFileWatcher(options: Options) {
-
-        let fileQueue: string[] = [];
         this.fileEmitter = new FileEmitter();
 
         // Add the event handler
-        this.fileEmitter.on(FileEvent.Change, (fileName) => {
-            fileQueue.push(fileName);
-            const eventLength = fileQueue.length;
-            // Delay the actual index logic by 1000 ms and call index service if no new event happens during this period
-            logger.emitDebug("DesignTimeService:initFileWatcher", "Receive event from file system");
-            setTimeout(() => {
-                if (fileQueue.length === eventLength) {
-                    logger.emitDebug("DesignTimeService:initFileWatcher", "No new file event happens, call index API");
-                    this.indexService.updateIndex(fileQueue);
-                    fileQueue = [];
-                } else {
-                    logger.emitDebug("DesignTimeService:initFileWatcher", "New file event happens");
-                }
-            }, 1000);
-        });
+        this.fileEmitter.on(FileEvent.Add, fileName => this.updateIndex(FileEvent.Add, fileName));
 
         // Watch File Repository
         this.fileService.watchFileRepository(options.rootPath, this.fileEmitter);
+    }
+
+    private async updateIndex(event: FileEvent, file: string) {
+        // await this.indexService.updateIndex(fileQueue);
+        if (this.delayTime > 0) {
+            this.fileQueue.push({ filePath: file, action: event });
+        } else {
+        }
+        console.log(file + " " + event);
+    }
+    private delay(fn: any, delay: number) {
+        let timer: any = null;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(() => fn.apply(context, args), delay);
+        };
     }
 }

@@ -17,7 +17,6 @@
 				"${workspaceFolder}/test"
 			],
 			"internalConsoleOptions": "openOnSessionStart",
-			"preLaunchTask": "npm: build"
 		},
 		{
 			"type": "node",

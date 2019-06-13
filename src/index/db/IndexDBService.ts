@@ -30,48 +30,30 @@ export class IndexDBService implements IIndexService {
 
     public async buildIndexFromFile(rootPath: string): Promise<void> {
         try {
-            const queue: File[] = [];
-            let stack: File[] = [];
-            let file = await this.fileService.readDirectory(rootPath);
-
-            queue.push(file);
-            let parent: Model = {} as Model;
-            let child: Model = {} as Model;
-            // parent.parent = "";
-
-            while (queue.length > 0) {
-                file = queue.shift();
-                child = new Model();
-                child.name = file.name;
-                child.filePath = path.relative(process.cwd(), file.path);
-                child.type = await this.getFileType(file);
-                if (parent.name) {
-                    child.parent = parent;
-                }
-                await this.addIndexToDB(child);
-                stack = file.children;
-                parent = child;
-                while (stack.length > 0) {
-                    file = stack.pop();
-                    if (file.isDir) {
-                        queue.push(file);
-                    } else {
-                        child = new Model();
-                        child.name = file.name;
-                        child.filePath = path.relative(process.cwd(), file.path);
-                        child.type = await this.getFileType(file);
-                        child.parent = parent;
-                        await this.addIndexToDB(child);
-                        if (child.type === 1) {
-                            this.addBoIndex(child);
-                        }
-                    }
-                }
-            }
+            const file = await this.fileService.readDirectory(rootPath);
+            const model: Model = {} as Model;
+            await this.buildIndex(file, model);
+            console.log(123);
         } catch (err) {
             logger.emitInfo("IndexDBService:initIndexRepository", err);
         }
         return;
+    }
+
+    public async buildIndex(file: File, parent: Model) {
+        const model: Model = new Model();
+        model.name = file.name;
+        model.type = this.getFileType(file);
+        model.filePath = path.relative(process.cwd(), file.path).replace(/\\/g, "/");
+        if (parent.name) {
+            model.parent = parent;
+        }
+        await this.addIndexToDB(model);
+        const queue = file.children;
+        while (queue.length > 0) {
+            const tmp = queue.shift();
+            await this.buildIndex(tmp, model);
+        }
     }
 
     public async updateIndex() {
@@ -83,11 +65,7 @@ export class IndexDBService implements IIndexService {
         return manger.save(model);
     }
 
-    public async addBoIndex(model: Model) {
-        const bo = JSON.parse(await this.fileService.readFileContent(model.filePath));
-        const nodes = bo.Nodes;
-    }
-    private async getFileType(file: File) {
+    private getFileType(file: File) {
         if (file.isDir) {
             return 3;
         }
@@ -98,20 +76,9 @@ export class IndexDBService implements IIndexService {
             case ".ui":
                 return 2;
             case ".json":
-                const isBo = await this.isBo(file);
-                if (isBo) {
-                    return 1;
-                }
-                return 99;
+                return 1;
             default:
                 return 99;
         }
-    }
-    private async isBo(file: File) {
-        const bo = JSON.parse(await this.fileService.readFileContent(file.path));
-        if (bo.NameKey && bo.Nodes) {
-            return true
-        }
-        return false;
     }
 }

@@ -1,3 +1,4 @@
+import { Timestamp } from "typeorm";
 export const enum ModelType {
     BusinessObject = 1,
     UIComponent = 2,
@@ -8,9 +9,11 @@ export const enum ModelType {
 export interface IModel {
     id: string;
     name: string;
-    type: string;
-    path: string;
-    content: string;
-    parent: IModel;
+    type: ModelType;
+    filePath: string;
     children: IModel[];
+    parent: IModel;
+    CreatedAt: Timestamp;
+    UpdatedAt: Timestamp;
+    content?: string;
 }

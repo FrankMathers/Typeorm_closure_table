@@ -1,19 +1,29 @@
-import { IFileService } from './IFileService'
-import { injectable } from 'inversify';
-import fs from "fs"
-import path from "path"
-import { File } from './File';
-import { IgnoreRule } from './IgnoreRule';
-import logger from "../log/LogService"
-import { FileEmitter, FileEvent } from './FileEmitter';
+import { IFileService } from "./IFileService";
+import { injectable } from "inversify";
+import fs from "fs";
+import * as fse from "fs-extra";
+import path from "path";
+import { File } from "./File";
+import { IgnoreRule } from "./IgnoreRule";
+import logger from "../log/LogService";
+import { FileEmitter, FileEvent } from "./FileEmitter";
+import * as chokidar from "chokidar";
 
 @injectable()
 export class FileService implements IFileService {
-
     public async watchFileRepository(rootPath: string, fileEmitter: FileEmitter): Promise<void> {
-        fs.watch(rootPath, { persistent: true, recursive: true }, (eventType, filename) => {
-            fileEmitter.emit(FileEvent.Change, filename);
-        });
+        const watch = chokidar.watch("src", { ignored: /node_modules|\.git/, persistent: true });
+        try {
+            watch.on("all", (event, filepath) => {
+                console.log(event, filepath);
+                fileEmitter.emit(event, filepath);
+            });
+        } catch (e) {
+            console.log(e);
+        }
+        // fs.watch(rootPath, { persistent: true, recursive: true }, (eventType, filename) => {
+        //     fileEmitter.emit(FileEvent.Change, filename);
+        // });
     }
 
     public async readFileContent(filePath: string): Promise<string> {
@@ -21,9 +31,12 @@ export class FileService implements IFileService {
         const result = await fsPromise.readFile(filePath);
         return result.toString();
     }
-
+    public async writeFileContent(filePath: string, fileContent: string): Promise<string> {
+        const fsPromise = fs.promises;
+        await fsPromise.writeFile(filePath, fileContent);
+        return;
+    }
     public async readDirectory(dirPath: string, parentFile?: File): Promise<File> {
-
         logger.emitInfo("FileService:readDirectory", "start to read directory " + dirPath);
 
         let parent: File;
@@ -45,7 +58,6 @@ export class FileService implements IFileService {
         const ignoreRule = await this.buildIgnoreRule(parent, result);
 
         for (const singleFile of result) {
-
             // Build file entry from file
             logger.emitDebug("FileService:readDirectory", "start to read file " + singleFile);
 
@@ -86,6 +98,11 @@ export class FileService implements IFileService {
         return;
     }
 
+    public async deleteDirectory(filePath: string) {
+        fse.emptyDirSync(filePath);
+        fs.rmdirSync(filePath);
+        return;
+    }
     private async buildIgnoreRule(parent: File, result: string[]): Promise<IgnoreRule> {
         const ignoreRule: IgnoreRule = new IgnoreRule();
         return ignoreRule;

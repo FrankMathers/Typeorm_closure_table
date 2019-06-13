@@ -6,6 +6,7 @@ import logger from "../log/LogService";
 import { injectable } from "inversify";
 import * as bodyParser from "body-parser";
 import "./controller/NodeController";
+import "./controller/ContentController";
 import { InversifyExpressServer } from "inversify-express-utils";
 import DIContainer from "../bootstrap/Container";
 
@@ -14,7 +15,6 @@ export class APIService implements IAPIService {
     public app = express();
     // public server: http.Server;
     public async start(options: Options) {
-
         const server = new InversifyExpressServer(DIContainer);
 
         server.setConfig(app => {
