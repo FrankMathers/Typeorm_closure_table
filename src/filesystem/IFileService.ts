@@ -1,5 +1,5 @@
 import { File } from "./File";
-import { FileEmitter } from "./FileEmitter";
+import { FileEmitter, FileEvent } from "./FileEmitter";
 
 export interface IFileService {
     watchFileRepository(rootPath: string, fileEmitter: FileEmitter): Promise<void>;
@@ -8,4 +8,9 @@ export interface IFileService {
     writeFileContent(path: string, content: string): Promise<string>;
     deleteFile(path: string): Promise<void>;
     deleteDirectory(path: string): Promise<void>;
+}
+
+export interface IFileWatches {
+    filePath: string,
+    event: FileEvent
 }

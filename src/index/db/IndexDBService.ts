@@ -1,7 +1,7 @@
 import { IIndexService } from "../IndexService";
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../bootstrap/types";
-import { IFileService } from "../../filesystem/IFileService";
+import { IFileWatches, IFileService } from "../../filesystem/IFileService";
 import { File } from "../../filesystem/File";
 import * as sqlite from "sqlite3";
 import { createConnection, getManager } from "typeorm";
@@ -56,7 +56,15 @@ export class IndexDBService implements IIndexService {
         }
     }
 
-    public async updateIndex() {
+    public async updateIndex(fileQueue: IFileWatches[]) {
+        fileQueue.sort((a, b) => {
+            return a.filePath.length - b.filePath.length;
+        })
+        const manager = getManager();
+        // const models = await manager.getTreeRepository(Model).findRoots();
+        await manager.createQueryBuilder().delete().from("model_closure").execute();
+        await manager.createQueryBuilder().delete().from("model").execute();
+        await this.buildIndexFromFile(process.cwd());
         return;
     }
 

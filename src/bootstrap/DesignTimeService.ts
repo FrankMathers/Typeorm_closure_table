@@ -9,12 +9,11 @@ import logger from "../log/LogService";
 import { IAPIService } from "../api/IAPIService";
 import express from "express";
 import { FileEmitter, FileEvent } from "../filesystem/FileEmitter";
-import { FILE } from "dns";
+import { IFileWatches } from "../filesystem/IFileService"
+const fileQueue: IFileWatches[] = [];
+let fileCount = fileQueue.length;
+let delayTime = 1000;
 
-interface iFile {
-    filePath: string;
-    action: FileEvent;
-}
 @injectable()
 export class DesignTimeService {
     @inject(TYPES.FileService) private fileService: IFileService;
@@ -25,9 +24,6 @@ export class DesignTimeService {
 
     private fileEmitter: FileEmitter;
 
-    private delayTime: number = 1000;
-
-    private fileQueue: iFile[] = [];
     public async start(options: Options): Promise<void> {
         // Set log level
         logger.setLogLevel(options.logLevel ? options.logLevel : Severity.Error);
@@ -58,27 +54,22 @@ export class DesignTimeService {
         this.fileEmitter = new FileEmitter();
 
         // Add the event handler
-        this.fileEmitter.on(FileEvent.Add, fileName => this.updateIndex(FileEvent.Add, fileName));
+        this.fileEmitter.on(FileEvent.Add, (file) => { this.updateIndex(FileEvent.Add, file) });
 
         // Watch File Repository
         this.fileService.watchFileRepository(options.rootPath, this.fileEmitter);
     }
 
     private async updateIndex(event: FileEvent, file: string) {
-        // await this.indexService.updateIndex(fileQueue);
-        if (this.delayTime > 0) {
-            this.fileQueue.push({ filePath: file, action: event });
-        } else {
-        }
-        console.log(file + " " + event);
-    }
-    private delay(fn: any, delay: number) {
-        let timer: any = null;
-        return function() {
-            const context = this;
-            const args = arguments;
-            clearTimeout(timer);
-            timer = setTimeout(() => fn.apply(context, args), delay);
-        };
+        delayTime = delayTime + 1000;
+        fileQueue.push({ filePath: "13", event: FileEvent.Add });
+        const count = fileQueue.length;
+        fileCount = fileQueue.length;
+        setTimeout(async () => {
+            delayTime = 0;
+            if (delayTime === 0 && count === fileCount) {
+                await this.indexService.updateIndex(fileQueue);
+            }
+        }, 10000);
     }
 }
