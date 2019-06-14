@@ -11,6 +11,6 @@ export interface IFileService {
 }
 
 export interface IFileWatches {
-    filePath: string,
-    event: FileEvent
+    filePath: string;
+    event: FileEvent;
 }

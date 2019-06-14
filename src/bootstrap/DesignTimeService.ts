@@ -9,7 +9,8 @@ import logger from "../log/LogService";
 import { IAPIService } from "../api/IAPIService";
 import express from "express";
 import { FileEmitter, FileEvent } from "../filesystem/FileEmitter";
-import { IFileWatches } from "../filesystem/IFileService"
+import { IFileWatches } from "../filesystem/IFileService";
+
 const fileQueue: IFileWatches[] = [];
 let fileCount = fileQueue.length;
 let delayTime = 1000;
@@ -30,10 +31,10 @@ export class DesignTimeService {
 
         logger.emitInfo("DesignTimeService:start", "Start initialization");
 
+        this.initFileWatcher(options);
+
         // Init Index Repository
         await this.indexService.initIndexRepository();
-
-        this.initFileWatcher(options);
 
         // Build index from File Repository
         await this.indexService.buildIndexFromFile(options.rootPath);
@@ -52,9 +53,11 @@ export class DesignTimeService {
 
     private initFileWatcher(options: Options) {
         this.fileEmitter = new FileEmitter();
-
+        logger.emitInfo("DesignTimeService:start", "End initialization");
         // Add the event handler
-        this.fileEmitter.on(FileEvent.Add, (file) => { this.updateIndex(FileEvent.Add, file) });
+        this.fileEmitter.on(FileEvent.Add, file => {
+            this.updateIndex(FileEvent.Add, file);
+        });
 
         // Watch File Repository
         this.fileService.watchFileRepository(options.rootPath, this.fileEmitter);

@@ -1,0 +1,705 @@
+{
+  "Key": {
+    "BOName": "Business Partner",
+    "BONamespace": "http://sap.com/x4/Metamodel"
+  },
+  "Nodes": [
+    {
+      "Key": {
+        "BOName": "Business Partner",
+        "BONamespace": "http://sap.com/x4/Metamodel",
+        "Name": "Root"
+      },
+      "ParentNodeName": "",
+      "Name": "Root",
+      "CategoryCode": "",
+      "EnabledIndicator": {
+        "Indicator": true,
+        "FinalIndicator": false,
+        "RedefinedIndicator": null
+      },
+      "CreateEnabledIndicator": {
+        "Indicator": false,
+        "FinalIndicator": false,
+        "RedefinedIndicator": null
+      },
+      "UpdateEnabledIndicator": {
+        "Indicator": false,
+        "FinalIndicator": false,
+        "RedefinedIndicator": null
+      },
+      "DeleteEnabledIndicator": {
+        "Indicator": false,
+        "FinalIndicator": false,
+        "RedefinedIndicator": null
+      },
+      "ReadOnlyOperationIndicator": {
+        "Indicator": false,
+        "FinalIndicator": false,
+        "RedefinedIndicator": null
+      },
+      "TransientNodeIDIndicator": {
+        "Indicator": false,
+        "FinalIndicator": false,
+        "RedefinedIndicator": null
+      },
+      "SeparatelyLockableIndicator": {
+        "Indicator": false,
+        "FinalIndicator": false,
+        "RedefinedIndicator": null
+      },
+      "Elements": [
+        {
+          "Key": {
+            "BOName": "Business Partner",
+            "BONamespace": "http://sap.com/x4/Metamodel",
+            "Name": "ID"
+          },
+          "Name": "ID",
+          "TypingDataTypeNameKey": { "Name": "", "Namespace": "" },
+          "TypingDataTypeKey": { "ProxyName": null },
+          "BuiltInDataType": {
+            "DataTypeCode": "NU",
+            "LengthNumberValue": "70",
+            "DecimalNumberValue": ""
+          },
+          "EnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "ReadOnlyIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "TransactionalMandatoryIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "TransientIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          }
+        },
+        {
+          "Key": {
+            "BOName": "Business Partner",
+            "BONamespace": "http://sap.com/x4/Metamodel",
+            "Name": "Name"
+          },
+          "Name": "Name",
+          "TypingDataTypeNameKey": { "Name": "", "Namespace": "" },
+          "TypingDataTypeKey": { "ProxyName": null },
+          "BuiltInDataType": {
+            "DataTypeCode": "ST",
+            "LengthNumberValue": "70",
+            "DecimalNumberValue": ""
+          },
+          "EnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "ReadOnlyIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "TransactionalMandatoryIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "TransientIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          }
+        },
+        {
+          "Key": {
+            "BOName": "Business Partner",
+            "BONamespace": "http://sap.com/x4/Metamodel",
+            "Name": "Code"
+          },
+          "Name": "Code",
+          "TypingDataTypeNameKey": { "Name": "", "Namespace": "" },
+          "TypingDataTypeKey": { "ProxyName": null },
+          "BuiltInDataType": {
+            "DataTypeCode": "ST",
+            "LengthNumberValue": "70",
+            "DecimalNumberValue": ""
+          },
+          "EnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "ReadOnlyIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "TransactionalMandatoryIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "TransientIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          }
+        },
+        {
+          "Key": {
+            "BOName": "Business Partner",
+            "BONamespace": "http://sap.com/x4/Metamodel",
+            "Name": "Type"
+          },
+          "Name": "Type",
+          "TypingDataTypeNameKey": { "Name": "", "Namespace": "" },
+          "TypingDataTypeKey": { "ProxyName": null },
+          "BuiltInDataType": {
+            "DataTypeCode": "ST",
+            "LengthNumberValue": "70",
+            "DecimalNumberValue": ""
+          },
+          "EnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "ReadOnlyIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "TransactionalMandatoryIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "TransientIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          }
+        }
+      ],
+      "Actions": [
+        {
+          "Key": {
+            "BOName": "Business Partner",
+            "BONamespace": "http://sap.com/x4/Metamodel",
+            "Name": "Approve"
+          },
+          "Name": "Approve",
+          "DataTypeName": "Approve",
+          "ParameterListImplType": "2",
+          "InstanceMultiplicityCode": "111",
+          "EnabledIndicator": {
+            "Indicator": true,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "ActionParamters": [
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "Measure Unit Code"
+              },
+              "Name": "Measure Unit Code",
+              "TypingDataTypeKey": {
+                "VersionID": null,
+                "ProxyName": "AP MEASURE"
+              },
+              "BuiltInDataType": {
+                "DataTypeCode": "14",
+                "LengthNumberValue": "100",
+                "DecimalNumberValue": ""
+              },
+              "EnabledIndicator": {
+                "Indicator": true,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "ReadOnlyIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "MandatoryIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "DynamicValueHelpIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "DefaultValue": {
+                "RedefinedIndicator": null,
+                "FinalIndicator": false,
+                "InitialIndicator": false,
+                "Value": ""
+              },
+              "ValueHelpBusinessObjectQueryKey": {
+                "QueryProxyName": "",
+                "BOProxyName": ""
+              }
+            }
+          ]
+        }
+      ],
+      "Queries": [
+        {
+          "Key": {
+            "BOName": "Business Partner",
+            "BONamespace": "http://sap.com/x4/Metamodel",
+            "Name": "Query_By_Elements"
+          },
+          "Name": "Query_By_Elements",
+          "EnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "EnhancedSearchEnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "QueryParamters": [
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "Element"
+              },
+              "Name": "Element",
+              "TypingDataTypeNameKey": {
+                "Name": "QUERY_ELEMENT",
+                "Namespace": "NAMESPACE"
+              },
+              "CorrespondingBusinessObjectNodeElementKey": "Corresp Node",
+              "DefaultValue": {
+                "RedefinedIndicator": null,
+                "FinalIndicator": false,
+                "InitialIndicator": false,
+                "Value": "ID"
+              },
+              "EnabledIndicator": {
+                "Indicator": true,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "ReadOnlyIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "MandatoryIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "DynamicValueHelpIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              }
+            }
+          ]
+        }
+      ],
+      "Associations": [
+        {
+          "Key": {
+            "BOName": "Business Partner",
+            "BONamespace": "http://sap.com/x4/Metamodel",
+            "Name": "To Core BO"
+          },
+          "Name": "To Core BO",
+          "ImplementationTypeCode": "Foreign Key",
+          "TargetBusinessObjectNodeKey": "Sales Order",
+          "TransactionalTargetAssociationMultiplicityCode": "",
+          "SourceForeignKeyBusinessObjectNodeElementName": "",
+          "TargetForeignKeyBusinessObjectNodeElementName": "",
+          "EnabledIndicator": {
+            "Indicator": true,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "CreateEnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "AssociationParamters": [
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "Language Code"
+              },
+              "Name": "Language Code",
+              "TypingDataTypeNameKey": {
+                "Name": "LANGUAGE CODE",
+                "Namespace": "NAMESPACE"
+              },
+              "BuiltInDataType": {
+                "DataTypeCode": "ST",
+                "LengthNumberValue": "100",
+                "DecimalNumberValue": ""
+              },
+              "TargetBusinessObjectNodeElementName": "Target",
+              "CompareOperatorCode": "Comp",
+              "DefaultValue": {
+                "RedefinedIndicator": null,
+                "FinalIndicator": false,
+                "InitialIndicator": false,
+                "Value": "001"
+              },
+              "EnabledIndicator": {
+                "Indicator": true,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "ReadOnlyIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "MandatoryIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              }
+            }
+          ]
+        }
+      ],
+      "Nodes": [
+        {
+          "Key": {
+            "BOName": "Business Partner",
+            "BONamespace": "http://sap.com/x4/Metamodel",
+            "Name": "Address Information"
+          },
+          "ParentNodeName": "Root",
+          "Name": "Address Information",
+          "CategoryCode": "",
+          "EnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "CreateEnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "UpdateEnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "DeleteEnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "ReadOnlyOperationIndicator": {
+            "Indicator": null,
+            "FinalIndicator": null,
+            "RedefinedIndicator": null
+          },
+          "TransientNodeIDIndicator": {
+            "Indicator": null,
+            "FinalIndicator": null,
+            "RedefinedIndicator": null
+          },
+          "SeparatelyLockableIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "Elements": [
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "Street"
+              },
+              "Name": "Street",
+              "TypingDataTypeNameKey": { "Name": "", "Namespace": "" },
+              "TypingDataTypeKey": { "ProxyName": null },
+              "BuiltInDataType": {
+                "DataTypeCode": "ST",
+                "LengthNumberValue": "70",
+                "DecimalNumberValue": ""
+              },
+              "EnabledIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "ReadOnlyIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransactionalMandatoryIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransientIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              }
+            },
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "City"
+              },
+              "Name": "City",
+              "TypingDataTypeNameKey": { "Name": "", "Namespace": "" },
+              "TypingDataTypeKey": { "ProxyName": null },
+              "BuiltInDataType": {
+                "DataTypeCode": "ST",
+                "LengthNumberValue": "70",
+                "DecimalNumberValue": ""
+              },
+              "EnabledIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "ReadOnlyIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransactionalMandatoryIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransientIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              }
+            },
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "Country"
+              },
+              "Name": "Country",
+              "TypingDataTypeNameKey": { "Name": "", "Namespace": "" },
+              "TypingDataTypeKey": { "ProxyName": null },
+              "BuiltInDataType": {
+                "DataTypeCode": "ST",
+                "LengthNumberValue": "70",
+                "DecimalNumberValue": ""
+              },
+              "EnabledIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "ReadOnlyIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransactionalMandatoryIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransientIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              }
+            }
+          ],
+          "Actions": [
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "Copy"
+              },
+              "Name": "Copy",
+              "DataTypeName": "Copy",
+              "ParameterListImplType": "2",
+              "InstanceMultiplicityCode": "111",
+              "EnabledIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "ActionParamters": []
+            }
+          ],
+          "Queries": [],
+          "Associations": []
+        },
+        {
+          "Key": {
+            "BOName": "Business Partner",
+            "BONamespace": "http://sap.com/x4/Metamodel",
+            "Name": "Payment Term"
+          },
+          "ParentNodeName": "Root",
+          "Name": "Payment Term",
+          "CategoryCode": "",
+          "EnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "CreateEnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "UpdateEnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "DeleteEnabledIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "ReadOnlyOperationIndicator": {
+            "Indicator": null,
+            "FinalIndicator": null,
+            "RedefinedIndicator": null
+          },
+          "TransientNodeIDIndicator": {
+            "Indicator": null,
+            "FinalIndicator": null,
+            "RedefinedIndicator": null
+          },
+          "SeparatelyLockableIndicator": {
+            "Indicator": false,
+            "FinalIndicator": false,
+            "RedefinedIndicator": null
+          },
+          "Elements": [
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "Payment Type"
+              },
+              "Name": "Payment Type",
+              "TypingDataTypeNameKey": { "Name": "", "Namespace": "" },
+              "TypingDataTypeKey": { "ProxyName": null },
+              "BuiltInDataType": {
+                "DataTypeCode": "ST",
+                "LengthNumberValue": "70",
+                "DecimalNumberValue": ""
+              },
+              "EnabledIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "ReadOnlyIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransactionalMandatoryIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransientIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              }
+            },
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "Payment Name"
+              },
+              "Name": "Payment Name",
+              "TypingDataTypeNameKey": { "Name": "", "Namespace": "" },
+              "TypingDataTypeKey": { "ProxyName": null },
+              "BuiltInDataType": {
+                "DataTypeCode": "ST",
+                "LengthNumberValue": "70",
+                "DecimalNumberValue": ""
+              },
+              "EnabledIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "ReadOnlyIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransactionalMandatoryIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "TransientIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              }
+            }
+          ],
+          "Actions": [],
+          "Queries": [
+            {
+              "Key": {
+                "BOName": "Business Partner",
+                "BONamespace": "http://sap.com/x4/Metamodel",
+                "Name": "Select_All"
+              },
+              "Name": "Select_All",
+              "EnabledIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "EnhancedSearchEnabledIndicator": {
+                "Indicator": false,
+                "FinalIndicator": false,
+                "RedefinedIndicator": null
+              },
+              "QueryParamters": []
+            }
+          ],
+          "Associations": []
+        }
+      ]
+    }
+  ]
+}

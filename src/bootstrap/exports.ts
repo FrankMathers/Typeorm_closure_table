@@ -11,6 +11,8 @@ import { APIService } from "../api/APIService";
 import { IAPIService } from "../api/IAPIService";
 import { IModelManager } from "../model/IModelManager";
 import { ModelManager } from "../model/ModelManager";
+import { IBoParser } from "../index/BoIndexutil/IBoParser";
+import { BoParser } from "../index/BoIndexutil/BoParser";
 // Init DI Container
 // File Service
 DIContainer.bind(FileService)
@@ -29,6 +31,12 @@ DIContainer.bind(APIService)
     .toSelf()
     .inSingletonScope();
 DIContainer.bind<IAPIService>(TYPES.APIService).toService(APIService);
+
+// Bo Parser
+DIContainer.bind(BoParser)
+    .toSelf()
+    .inSingletonScope();
+DIContainer.bind<IBoParser>(TYPES.BoParser).toService(BoParser);
 
 DIContainer.bind(ModelManager)
     .toSelf()

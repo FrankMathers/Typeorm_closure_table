@@ -15,15 +15,12 @@ export class FileService implements IFileService {
         const watch = chokidar.watch("src", { ignored: /node_modules|\.git/, persistent: true });
         try {
             watch.on("all", (event, filepath) => {
-                console.log(event, filepath);
+                logger.emitInfo("FileService:FileChanged", event, filepath);
                 fileEmitter.emit(event, filepath);
             });
         } catch (e) {
-            console.log(e);
+            logger.emitInfo("FileService:WatchFile", "error occured:" + e);
         }
-        // fs.watch(rootPath, { persistent: true, recursive: true }, (eventType, filename) => {
-        //     fileEmitter.emit(FileEvent.Change, filename);
-        // });
     }
 
     public async readFileContent(filePath: string): Promise<string> {
@@ -32,8 +29,9 @@ export class FileService implements IFileService {
         return result.toString();
     }
     public async writeFileContent(filePath: string, fileContent: string): Promise<string> {
-        const fsPromise = fs.promises;
-        await fsPromise.writeFile(filePath, fileContent);
+        // const fsPromise = fs.promises;
+        // await fsPromise.writeFile(filePath, fileContent);
+        await fse.outputFile(filePath, fileContent);
         return;
     }
     public async readDirectory(dirPath: string, parentFile?: File): Promise<File> {

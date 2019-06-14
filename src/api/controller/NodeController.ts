@@ -1,5 +1,5 @@
 import * as express from "express";
-import { interfaces, controller, httpGet, httpDelete, request, response, TYPE } from "inversify-express-utils";
+import { interfaces, controller, httpGet, httpDelete, request, response } from "inversify-express-utils";
 import { injectable, inject } from "inversify";
 import { IModelManager } from "../../model/IModelManager";
 import { INodeQuery, IContentQuery } from "../../model/base/IModelQuery";
@@ -9,7 +9,7 @@ import { TYPES } from "../../bootstrap/types";
 export class NodeController implements interfaces.Controller {
     @inject(TYPES.ModelManager) private modelManager: IModelManager;
 
-    @httpGet("(/)?*")
+    @httpGet("(/)?*(/*.json)")
     public async getRoot(@request() req: express.Request, @response() res: express.Response) {
         let path: string;
         if (req.params[1]) {

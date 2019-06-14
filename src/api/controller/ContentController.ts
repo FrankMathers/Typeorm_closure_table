@@ -14,12 +14,13 @@ import {
 import { injectable, inject } from "inversify";
 import { IFileService } from "../../filesystem/IFileService";
 import { TYPES } from "../../bootstrap/types";
-import { ModelManager } from "../../model/ModelManager";
+import { IModelManager } from "../../model/IModelManager";
 import { IContentQuery } from "../../model/base/IModelQuery";
 import { IModel } from "../../model/base/IModel";
 
 @controller("/v1/apis/contents")
 export class ContentController implements interfaces.Controller {
+    @inject(TYPES.ModelManager) private modelManager: IModelManager;
     // constructor(@inject(TYPES.FileService) private fileService: IFileService) {}
 
     @httpGet("/*")
@@ -28,9 +29,7 @@ export class ContentController implements interfaces.Controller {
 
         const query: IContentQuery = { path: url, content: "" };
 
-        const modelManager: ModelManager = new ModelManager();
-
-        return modelManager.getContent(query);
+        return this.modelManager.getContent(query);
 
         // return this.fileService.readFileContent(url);
     }
@@ -41,9 +40,7 @@ export class ContentController implements interfaces.Controller {
 
         const query: IContentQuery = { path: url, content: req.body.content };
 
-        const modelManager: ModelManager = new ModelManager();
-
-        modelManager.putContent(query);
+        this.modelManager.putContent(query);
 
         // this.fileService.writeFileContent(url, req.body.content);
 

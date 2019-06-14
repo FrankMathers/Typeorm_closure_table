@@ -6,7 +6,6 @@
 	],
 	"synchronize": true,
 	"logging": [
-		"query",
 		"error",
 		"schema",
 		"warn"
