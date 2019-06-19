@@ -123,43 +123,60 @@ export class IndexDBService implements IIndexService {
 
     public async updateIndex(fileQueue: IFileWatches[]) {
         // need recheck
-        const res: any = new Object();
-        for (const item of fileQueue) {
-            if (item.event === FileEvent.Change && item.filePath.match(/.bo$/)) {
-                res[item.filePath] = item.event;
-            } else {
-                res[item.filePath] = item.event;
-            }
+        fileQueue.sort((a, b) => {
+            return a.filePath.length - b.filePath.length;
+        })
+        const parent = this.getCommonParent(fileQueue);
+        const model = await getTreeRepository(Model).findOne({ path: parent.filePath });
+        const exists = model ? 1 : 0;
+        if (exists) {
+            await this.unlinkIndex(parent);
+            await this.addIndex(parent);
+        } else {
+            await this.addIndex(parent);
         }
-        const filewatches: IFileWatches[] = Object.keys(res).map(key => {
-            return { filePath: key, event: res[key] } as IFileWatches;
-        });
-        for (const item of filewatches) {
-            const model = await getTreeRepository(Model).findOne({ path: item.filePath });
-            const exists = model ? 1 : 0;
-            switch (item.event) {
-                case FileEvent.Add || FileEvent.AddDir:
-                    if (exists) {
-                        await this.unlinkIndex(item);
-                    }
-                    await this.addIndex(item);
-                    break;
-                case FileEvent.Unlink || FileEvent.UnlinkDir:
-                    if (exists) {
-                        await this.unlinkIndex(item);
-                    }
-                    break;
-                case FileEvent.Change:
-                    break;
-            }
-        }
+        // const res: any = new Object();
+        // for (const item of fileQueue) {
+        //     if (item.event === FileEvent.Change && item.filePath.match(/.bo$/)) {
+        //         res[item.filePath] = item.event;
+        //     } else {
+        //         res[item.filePath] = item.event;
+        //     }
+        // }
+        // const filewatches: IFileWatches[] = Object.keys(res).map(key => {
+        //     return { filePath: key, event: res[key] } as IFileWatches;
+        // });
+        // for (const item of filewatches) {
+        //     const model = await getTreeRepository(Model).findOne({ path: item.filePath });
+        //     const exists = model ? 1 : 0;
+        //     switch (item.event) {
+        //         case FileEvent.Add || FileEvent.AddDir:
+        //             if (exists) {
+        //                 await this.unlinkIndex(item);
+        //             }
+        //             await this.addIndex(item);
+        //             break;
+        //         case FileEvent.Unlink || FileEvent.UnlinkDir:
+        //             if (exists) {
+        //                 await this.unlinkIndex(item);
+        //             }
+        //             break;
+        //         case FileEvent.Change:
+        //             break;
+        //     }
+        // }
     }
     public async addIndex(item: IFileWatches) {
-        const parentPath = path.join(item.filePath, "../");
+        const parentPath = path.relative(process.cwd(), path.join(item.filePath, "..")).replace(/\\/g, "/");;
         const parent = await getManager()
             .getTreeRepository(Model)
             .findOne({ path: parentPath });
-        const file = await this.fileService.readDirectory(item.filePath);
+        let file: File;
+        if (item.event === FileEvent.Add) {
+            file = this.fileService.readFile(item.filePath);
+        } else {
+            file = await this.fileService.readDirectory(item.filePath);
+        }
         await this.buildIndex(file, parent);
     }
 
@@ -244,5 +261,16 @@ export class IndexDBService implements IIndexService {
             default:
                 return 99;
         }
+    }
+
+    private getCommonParent(fileQueue: IFileWatches[]) {
+        const commonParent = fileQueue[0].filePath;
+        const regx = new RegExp('^' + commonParent)
+        for (const item of fileQueue) {
+            if (!item.filePath.match(regx)) {
+                return { filePath: path.join(commonParent, ".."), event: FileEvent.AddDir };
+            }
+        }
+        return fileQueue[0];
     }
 }

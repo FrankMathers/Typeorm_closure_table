@@ -91,6 +91,6 @@ export class DesignTimeService {
                 await this.indexService.updateIndex(fileQueue);
                 fileQueue.length = 0;
             }
-        }, 10000);
+        }, 5000);
     }
 }

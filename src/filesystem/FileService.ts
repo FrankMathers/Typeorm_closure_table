@@ -49,6 +49,17 @@ export class FileService implements IFileService {
             throw new Error(error.message);
         }
     }
+
+    public readFile(filePath: string): File {
+        const fileEntry = new File();
+        fileEntry.name = path.basename(filePath);
+        fileEntry.path = filePath
+        fileEntry.parentPath = path.join(filePath, "..");
+        fileEntry.isDir = false
+        fileEntry.type = path.extname(fileEntry.path);
+        logger.emitDebug("FileService:ReadFile", filePath);
+        return fileEntry;
+    }
     public async readDirectory(dirPath: string, parentFile?: File): Promise<File> {
         logger.emitInfo("FileService:readDirectory", "start to read directory " + dirPath);
 
@@ -65,14 +76,8 @@ export class FileService implements IFileService {
         }
 
         const fsPromise = fs.promises;
-        const isDir = await fsPromise.stat(dirPath).then(stat => stat.isDirectory());
-        let result;
-        if (isDir) {
-            result = await fsPromise.readdir(dirPath);
-        } else {
-            result = [] as string[];
-            result.push(path.basename(dirPath));
-        }
+
+        const result = await fsPromise.readdir(dirPath);
 
         // Build ignore rules
         const ignoreRule = await this.buildIgnoreRule(parent, result);
