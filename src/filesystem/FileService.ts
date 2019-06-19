@@ -12,27 +12,42 @@ import * as chokidar from "chokidar";
 @injectable()
 export class FileService implements IFileService {
     public async watchFileRepository(rootPath: string, fileEmitter: FileEmitter): Promise<void> {
-        const watch = chokidar.watch("src", { ignored: /node_modules|\.git/, persistent: true });
+        const watch = chokidar.watch("src", {
+            ignored: /node_modules|\.git/,
+            persistent: true,
+            ignoreInitial: true
+        });
         try {
             watch.on("all", (event, filepath) => {
                 logger.emitInfo("FileService:FileChanged", event, filepath);
                 fileEmitter.emit(event, filepath);
             });
         } catch (e) {
-            logger.emitInfo("FileService:WatchFile", "error occured:" + e);
+            logger.emitError("FileService:WatchFile", "error occured:" + e);
         }
     }
 
     public async readFileContent(filePath: string): Promise<string> {
-        const fsPromise = fs.promises;
-        const result = await fsPromise.readFile(filePath);
-        return result.toString();
+        // const fsPromise = fs.promises;
+        // const result = await fsPromise.readFile(filePath);
+        // return result.toString();
+        try {
+            const fsPromise = fs.promises;
+            const result = await fsPromise.readFile(filePath);
+            return result.toString();
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
     public async writeFileContent(filePath: string, fileContent: string): Promise<string> {
         // const fsPromise = fs.promises;
         // await fsPromise.writeFile(filePath, fileContent);
-        await fse.outputFile(filePath, fileContent);
-        return;
+        try {
+            await fse.outputFile(filePath, fileContent);
+            return;
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
     public async readDirectory(dirPath: string, parentFile?: File): Promise<File> {
         logger.emitInfo("FileService:readDirectory", "start to read directory " + dirPath);
@@ -50,7 +65,14 @@ export class FileService implements IFileService {
         }
 
         const fsPromise = fs.promises;
-        const result = await fsPromise.readdir(dirPath);
+        const isDir = await fsPromise.stat(dirPath).then(stat => stat.isDirectory());
+        let result;
+        if (isDir) {
+            result = await fsPromise.readdir(dirPath);
+        } else {
+            result = [] as string[];
+            result.push(path.basename(dirPath));
+        }
 
         // Build ignore rules
         const ignoreRule = await this.buildIgnoreRule(parent, result);
@@ -108,7 +130,12 @@ export class FileService implements IFileService {
 
     private matchIgnoreRule(singleFile: string, ignoreRule: IgnoreRule): boolean {
         // First hard code the ignore rules instead of read it from .gitignore danamically
-        if (singleFile === "node_modules" || singleFile === "dist" || singleFile === ".git") {
+        if (
+            singleFile === "node_modules" ||
+            singleFile === "dist" ||
+            singleFile === ".git" ||
+            singleFile === ".vscode"
+        ) {
             return true;
         } else {
             return false;

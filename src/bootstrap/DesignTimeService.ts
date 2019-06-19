@@ -53,25 +53,43 @@ export class DesignTimeService {
 
     private initFileWatcher(options: Options) {
         this.fileEmitter = new FileEmitter();
-        logger.emitInfo("DesignTimeService:start", "End initialization");
+        logger.emitInfo("DesignTimeService:initFileWatcher", "Start initialization");
         // Add the event handler
+
+        // Add event
         this.fileEmitter.on(FileEvent.Add, file => {
             this.updateIndex(FileEvent.Add, file);
         });
-
+        // Unlink event
+        this.fileEmitter.on(FileEvent.Unlink, file => {
+            this.updateIndex(FileEvent.Unlink, file);
+        });
+        // AddDir event
+        this.fileEmitter.on(FileEvent.AddDir, file => {
+            this.updateIndex(FileEvent.AddDir, file);
+        });
+        // Add event
+        this.fileEmitter.on(FileEvent.UnlinkDir, file => {
+            this.updateIndex(FileEvent.UnlinkDir, file);
+        });
+        // Change event
+        this.fileEmitter.on(FileEvent.Change, file => {
+            this.updateIndex(FileEvent.Change, file);
+        });
         // Watch File Repository
         this.fileService.watchFileRepository(options.rootPath, this.fileEmitter);
     }
 
     private async updateIndex(event: FileEvent, file: string) {
         delayTime = delayTime + 1000;
-        fileQueue.push({ filePath: "13", event: FileEvent.Add });
+        fileQueue.push({ filePath: file, event });
         const count = fileQueue.length;
         fileCount = fileQueue.length;
         setTimeout(async () => {
             delayTime = 0;
             if (delayTime === 0 && count === fileCount) {
                 await this.indexService.updateIndex(fileQueue);
+                fileQueue.length = 0;
             }
         }, 10000);
     }

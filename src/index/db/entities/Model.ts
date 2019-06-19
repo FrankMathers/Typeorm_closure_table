@@ -21,11 +21,13 @@ export class Model implements IModel {
     @Column()
     public name: string;
 
+    @Column("varchar", { nullable: true })
+    public namespace: string;
     @Column()
     public type: ModelType;
 
     @Column()
-    public filePath: string;
+    public path: string;
 
     @TreeChildren()
     public children: Model[];

@@ -5,7 +5,8 @@ export interface IIndexService {
 
     buildIndexFromFile(rootPath: string): Promise<void>;
 
-    buildIndexFromBO(jsonFilePath: string, nodeParent: Model): Promise<void>;
+    buildIndexFromBO(boFilePath: string, nodeParent: Model): Promise<void>;
 
     updateIndex(fileQueue: IFileWatches[]): Promise<void>;
+    unlinkIndex(fileQueue: IFileWatches): Promise<void>;
 }

@@ -12,8 +12,9 @@ export const enum ModelType {
 export interface IModel {
     id: string;
     name: string;
+    namespace: string;
     type: ModelType;
-    filePath: string;
+    path: string;
     children: IModel[];
     parent: IModel;
     CreatedAt: Timestamp;

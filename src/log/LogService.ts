@@ -2,84 +2,86 @@ import { injectable } from "inversify";
 import winston from "winston";
 
 export enum Severity {
-  Error = "Error",
-  Warning = "Warning",
-  Performance = "Performance",
-  Info = "Info",
-  Debug = "Debug"
+    Error = "Error",
+    Warning = "Warning",
+    Performance = "Performance",
+    Info = "Info",
+    Debug = "Debug"
 }
 
 export interface ILogService {
-  emitError(location: string, info: string, data?: any): void;
-  emitDebug(location: string, info: string, data?: any): void;
-  emitInfo(location: string, info: string, data?: any): void;
+    emitError(location: string, info: string, data?: any): void;
+    emitDebug(location: string, info: string, data?: any): void;
+    emitInfo(location: string, info: string, data?: any): void;
 
-  setLogLevel(logLevel: Severity): void;
+    setLogLevel(logLevel: Severity): void;
 }
 
 @injectable()
 export class LogServiceImpl implements ILogService {
+    private logger: winston.Logger;
 
-  private logger: winston.Logger;
+    public constructor() {
+        const logLevels = {
+            levels: {
+                Error: 0,
+                Warning: 1,
+                Performance: 2,
+                Info: 3,
+                Debug: 4
+            },
+            colors: {
+                Error: "red",
+                Warning: "yellow",
+                Performance: "green",
+                Info: "blue",
+                Debug: "gray"
+            }
+        };
 
-  public constructor() {
+        const alignedWithColorsAndTime = winston.format.combine(
+            winston.format.colorize(),
+            winston.format.timestamp(),
+            winston.format.printf((info: any) => {
+                const { timestamp, level, message, ...args } = info;
+                const ts = timestamp.slice(0, 19).replace("T", " ");
 
-    const logLevels = {
-      levels: {
-        Error: 0,
-        Warning: 1,
-        Performance: 2,
-        Info: 3,
-        Debug: 4
-      },
-      colors: {
-        Error: "red",
-        Warning: "yellow",
-        Performance: "green",
-        Info: "blue",
-        Debug: "gray"
-      }
-    };
+                return `${ts} [${level}]: ${message}`;
+            })
+        );
 
-    const alignedWithColorsAndTime = winston.format.combine(
-      winston.format.colorize(),
-      winston.format.timestamp(),
-      winston.format.printf((info: any) => {
-        const { timestamp, level, message, ...args } = info;
-        const ts = timestamp.slice(0, 19).replace("T", " ");
+        winston.addColors(logLevels.colors);
 
-        return `${ts} [${level}]: ${message}`;
-      })
-    );
+        this.logger = winston.createLogger({
+            levels: logLevels.levels,
+            transports: [
+                new winston.transports.Console({
+                    level: Severity.Debug,
+                    format: alignedWithColorsAndTime
+                })
+            ]
+        });
+    }
 
-    winston.addColors(logLevels.colors);
+    public emitError(location: string, info: string, data?: any) {
+        this.logger.log({ level: Severity.Error, message: location + "-" + info });
+    }
+    public emitDebug(location: string, info: string, data?: any) {
+        this.logger.log({ level: Severity.Debug, message: location + "-" + info });
+    }
+    public emitInfo(location: string, info: string, data?: any) {
+        if (data) {
+            this.logger.log({ level: Severity.Info, message: `${location}-${info}:${data}` });
+        } else {
+            this.logger.log({ level: Severity.Info, message: location + "-" + info });
+        }
+    }
 
-    this.logger = winston.createLogger({
-      levels: logLevels.levels,
-      transports: [
-        new winston.transports.Console({
-          level: Severity.Debug,
-          format: alignedWithColorsAndTime
-        })]
-    });
-  }
-
-  public emitError(location: string, info: string, data?: any) {
-    this.logger.log({ level: Severity.Error, message: location + '-' + info });
-  }
-  public emitDebug(location: string, info: string, data?: any) {
-    this.logger.log({ level: Severity.Debug, message: location + '-' + info });
-  }
-  public emitInfo(location: string, info: string, data?: any) {
-    this.logger.log({ level: Severity.Info, message: location + '-' + info });
-  }
-
-  public setLogLevel(logLevel: Severity) {
-    this.logger.transports[0].level = logLevel;
-  }
+    public setLogLevel(logLevel: Severity) {
+        this.logger.transports[0].level = logLevel;
+    }
 }
 
 const logger: ILogService = new LogServiceImpl();
 
-export default logger
-
+export default logger;

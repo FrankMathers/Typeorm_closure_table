@@ -4,15 +4,22 @@ import { TYPES } from "../../bootstrap/types";
 import { IFileWatches, IFileService } from "../../filesystem/IFileService";
 import { File } from "../../filesystem/File";
 import * as sqlite from "sqlite3";
-import { ConnectionOptions, createConnection, getManager } from "typeorm";
+import {
+    ConnectionOptions,
+    createConnection,
+    getManager,
+    getRepository,
+    getConnection,
+    getTreeRepository
+} from "typeorm";
 import * as path from "path";
 import { Model } from "./entities/Model";
 import { ModelType } from "../../model/base/IModel";
 import logger from "../../log/LogService";
 import { BoNode } from "../BoIndexutil/BoNode";
 import { IBoParser } from "../BoIndexutil/IBoParser";
-// tslint:disable-next-line
-const readjson = require("readjson");
+import stripJsonComments from "strip-json-comments";
+import { FileEvent } from "../../filesystem/FileEmitter";
 
 @injectable()
 export class IndexDBService implements IIndexService {
@@ -27,7 +34,7 @@ export class IndexDBService implements IIndexService {
         try {
             await this.fileService.deleteFile(`./temp/dts.sqlite3`);
         } catch (e) {
-            logger.emitInfo("IndexDBService:initIndexRepository", "no dts.sqlite3 exists");
+            logger.emitError("IndexDBService:initIndexRepository", "no dts.sqlite3 exists");
         }
         const option: ConnectionOptions = {
             type: "sqlite",
@@ -40,29 +47,38 @@ export class IndexDBService implements IIndexService {
         await createConnection(option);
         return;
     }
-    public async buildIndexFromBO(jsonFilePath: string, nodeParent: Model): Promise<void> {
+    public async buildIndexFromBO(boFilePath: string, nodeParent: Model): Promise<void> {
         try {
             let parent: Model = {} as Model;
             parent = nodeParent;
-            const rootNode = readjson.sync(jsonFilePath);
+            // const rootNode = readjson.sync(jsonFilePath);
+            const fileContent = await this.fileService.readFileContent(boFilePath);
+            const rootNode = JSON.parse(stripJsonComments(fileContent));
+
             if (rootNode.Nodes) {
+                // change parent to fit the bo query requirement
+                await getConnection()
+                    .createQueryBuilder()
+                    .update("model")
+                    .set({ name: rootNode.Key.BOName, namespace: rootNode.Key.BONamespace })
+                    .where("path = :path", { path: parent.path })
+                    .execute();
+                // start to parse Bo
                 const node = await this.boParser.parseBo(rootNode.Nodes[0], "Nodes[0]");
-                await this.buildIndexBoNode(node, parent, jsonFilePath);
-                logger.emitInfo(
-                    "IndexDBService:initIndexRepository",
-                    `Bo build:${path.basename(jsonFilePath)} success`
-                );
+                await this.buildIndexBoNode(node, parent, boFilePath);
+                logger.emitInfo("IndexDBService:initIndexRepository", `Bo build:${path.basename(boFilePath)} success`);
             }
         } catch (err) {
-            logger.emitInfo("IndexDBService:initIndexRepository", err);
+            logger.emitError("IndexDBService:initIndexRepository", err);
         }
     }
     public async buildIndexBoNode(node: BoNode, parent: Model, boFilePath: string) {
         const boPath = path.relative(process.cwd(), boFilePath).replace(/\\/g, "/");
         const model: Model = new Model();
         model.name = node.name;
+        model.namespace = node.boNamespace;
         model.type = this.getNodeType(node);
-        model.filePath = boPath + "/" + node.path;
+        model.path = boPath + "/" + node.path;
         if (parent.name) {
             model.parent = parent;
         }
@@ -81,7 +97,7 @@ export class IndexDBService implements IIndexService {
             await this.buildIndex(file, model);
             logger.emitInfo("IndexDBService:initIndexRepository", "Build Success");
         } catch (err) {
-            logger.emitInfo("IndexDBService:initIndexRepository", err);
+            logger.emitError("IndexDBService:initIndexRepository", err);
         }
         return;
     }
@@ -90,14 +106,13 @@ export class IndexDBService implements IIndexService {
         const model: Model = new Model();
         model.name = file.name;
         model.type = this.getFileType(file);
-        model.filePath = path.relative(process.cwd(), file.path).replace(/\\/g, "/");
+        model.path = path.relative(process.cwd(), file.path).replace(/\\/g, "/");
         if (parent.name) {
             model.parent = parent;
         }
-
         await this.addIndexToDB(model);
         if (model.type === 1) {
-            await this.buildIndexFromBO(model.filePath, model);
+            await this.buildIndexFromBO(model.path, model);
         }
         const queue = file.children;
         while (queue.length > 0) {
@@ -107,23 +122,91 @@ export class IndexDBService implements IIndexService {
     }
 
     public async updateIndex(fileQueue: IFileWatches[]) {
-        fileQueue.sort((a, b) => {
-            return a.filePath.length - b.filePath.length;
+        // need recheck
+        const res: any = new Object();
+        for (const item of fileQueue) {
+            if (item.event === FileEvent.Change && item.filePath.match(/.bo$/)) {
+                res[item.filePath] = item.event;
+            } else {
+                res[item.filePath] = item.event;
+            }
+        }
+        const filewatches: IFileWatches[] = Object.keys(res).map(key => {
+            return { filePath: key, event: res[key] } as IFileWatches;
         });
-        const manager = getManager();
-        // const models = await manager.getTreeRepository(Model).findRoots();
-        await manager
-            .createQueryBuilder()
-            .delete()
-            .from("model_closure")
-            .execute();
-        await manager
-            .createQueryBuilder()
-            .delete()
-            .from("model")
-            .execute();
-        await this.buildIndexFromFile(process.cwd());
-        return;
+        for (const item of filewatches) {
+            const model = await getTreeRepository(Model).findOne({ path: item.filePath });
+            const exists = model ? 1 : 0;
+            switch (item.event) {
+                case FileEvent.Add || FileEvent.AddDir:
+                    if (exists) {
+                        await this.unlinkIndex(item);
+                    }
+                    await this.addIndex(item);
+                    break;
+                case FileEvent.Unlink || FileEvent.UnlinkDir:
+                    if (exists) {
+                        await this.unlinkIndex(item);
+                    }
+                    break;
+                case FileEvent.Change:
+                    break;
+            }
+        }
+    }
+    public async addIndex(item: IFileWatches) {
+        const parentPath = path.join(item.filePath, "../");
+        const parent = await getManager()
+            .getTreeRepository(Model)
+            .findOne({ path: parentPath });
+        const file = await this.fileService.readDirectory(item.filePath);
+        await this.buildIndex(file, parent);
+    }
+
+    public async unlinkIndex(fileQueue: IFileWatches) {
+        // unlink file dir or file
+        const repository = getRepository(Model);
+
+        const absPath = path.relative(process.cwd(), fileQueue.filePath).replace(/\\/g, "/");
+        if (fileQueue.event === "unlink") {
+            const targetRootModel = await getTreeRepository(Model).findOne({ path: absPath });
+            const targetModels = await getTreeRepository(Model).findDescendants(targetRootModel);
+            await this.unlinkIndexFromDB(targetModels);
+        }
+    }
+
+    public async unlinkIndexFromDB(targetModels: Model[]): Promise<void> {
+        if (targetModels.length !== 0) {
+            logger.emitInfo("IndexDBService:UnlinkIndex", targetModels.length + " line(s) data will be unlinked");
+            try {
+                targetModels.forEach(async targetModel => {
+                    // detele from model_closure firstly
+                    await getConnection()
+                        .createQueryBuilder()
+                        .delete()
+                        .from("model_closure")
+                        .where("id_descendant = :id", { id: targetModel.id })
+                        .execute();
+                    // update the parentId to Null
+                    await getConnection()
+                        .createQueryBuilder()
+                        .update("model")
+                        .set({ parent: null })
+                        .where("id = :id", { id: targetModel.id })
+                        .execute();
+                    // delete from model table
+                    await getConnection()
+                        .createQueryBuilder()
+                        .delete()
+                        .from("model")
+                        .where("id = :id", { id: targetModel.id })
+                        .execute();
+                });
+                logger.emitInfo("IndexDBService:UnlinkIndex", targetModels.length + " line(s) data has been unlinked");
+            } catch (err) {
+                logger.emitError("IndexDBService:UnlinkIndex", err);
+            }
+        }
     }
 
     public async addIndexToDB(model: Model): Promise<Model> {
@@ -141,13 +224,14 @@ export class IndexDBService implements IIndexService {
         switch (file.type.toLocaleLowerCase()) {
             case ".ui":
                 return 2;
-            case ".json":
+            case ".bo":
                 return 1;
+            case ".json":
+                return 99;
             default:
                 return 99;
         }
     }
-
     private getNodeType(node: BoNode): ModelType {
         if (!node.type) {
             return 99;

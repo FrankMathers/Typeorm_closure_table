@@ -25,6 +25,15 @@ export class APIService implements IAPIService {
                 })
             );
             app.use(bodyParser.json());
+            // tslint:disable-next-line: only-arrow-functions
+            app.all("*", function(req, res, next) {
+                res.header("Access-Control-Allow-Origin", "*");
+                res.header("Access-Control-Allow-Headers", "X-Requested-With");
+                res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+                res.header("X-Powered-By", " 3.2.1");
+                res.header("Content-Type", "application/json;charset=utf-8");
+                next();
+            });
         });
         server.build().listen(options.port, () => {
             logger.emitInfo("App is running at http://localhost:%d".replace("%d", options.port), "Restful API started");
