@@ -54,7 +54,7 @@
         "sqlite": "^3.0.3",
         "sqlite3": "4.0.7",
         "strip-json-comments": "^3.0.1",
-        "typeorm": "^0.2.17",
+        "typeorm": "^0.2.25",
         "winston": "^3.2.1",
         "yargs": "^13.2.4"
     }
