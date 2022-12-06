@@ -44,12 +44,12 @@
         "typescript": "^3.5.1"
     },
     "dependencies": {
-        "body-parser": "^1.19.0",
+        "body-parser": "^1.20.1",
         "chokidar": "^3.0.1",
-        "express": "^4.17.1",
+        "express": "^4.18.2",
         "fs-extra": "^8.0.1",
         "inversify": "^5.0.1",
-        "inversify-express-utils": "^6.3.2",
+        "inversify-express-utils": "^6.4.3",
         "reflect-metadata": "^0.1.13",
         "sqlite": "^3.0.3",
         "sqlite3": "4.0.7",
